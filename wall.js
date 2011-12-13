@@ -45,20 +45,18 @@ function init() {
                 },
                 function(){
                     this.animate({opacity: 0.4, width: this.attrs.width-5, height: this.attrs.height-5}, 300);
-                })
+                });
 
             iter += 1;
             if (iter  == response.list.length) {
                 return;
             }
-            thumb.animate({opacity: 0.3}, 1000, '>');
+            thumb.animate({opacity: 0.3}, 500, '>');
         }
 
         for (var i = 0; i < response.list.length; i++) {
             setTimeout(draw_elt, i * 20)
         }
-
-        draw_elt();
     });
 }
 
