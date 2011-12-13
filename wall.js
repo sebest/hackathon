@@ -10,7 +10,7 @@ function init() {
 
     var paper = Raphael(0, 0, width, height);
 
-    DM.api('/videos', {limit: 100, fields: 'thumbnail_medium_url,title', filters: 'official', channel: 'sexy', sort: 'visited-week'}, function(response) {
+    DM.api('/videos', {limit: 100, fields: 'thumbnail_medium_url,title,id', filters: 'official', channel: 'sport', sort: 'visited-week'}, function(response) {
         var list = response.list;
         var iter = 0;
 
@@ -34,15 +34,28 @@ function init() {
             position.splice(rand_pos, 1);
             var thumb = paper.image(list[iter].thumbnail_medium_url, pos.x, pos.y, 160, 120);
             thumb.pos = pos;
-
+            thumb.dm = list[iter];
             thumb.toBack();
 
             thumb.click(function() {
                 if (thumb_clicked != null) {
-                    thumb_clicked.toBack().animate({x: thumb_clicked.pos.x, y: thumb_clicked.pos.y, width: 160, height: 120}, 300, 'bounce');
+                    // there is already a player displayed
+                    thumb_clicked.toBack().animate({x: thumb_clicked.pos.x, y: thumb_clicked.pos.y, width: 160, height: 120}, 300, 'bounce', function() {$('#player').empty();});
                 }
                 if (this != thumb_clicked) {
-                    this.toFront().animate({x: width/2 - 320, y: height/2 - 240, width: 640, height: 480}, 300, 'bounce', function() {thumb_clicked = this;});
+                    // this is a different player
+                    this.toFront().animate({x: width/2 - 320, y: height/2 - 240, width: 640, height: 480}, 300, 'bounce', function() {
+                        thumb_clicked = this;
+                        flashvars = {};
+                        params = {};
+                        attributes = {};
+                        swfobject.embedSWF("http://dailymotion.com/swf/" + thumb.dm.id + "?enableApi=1&autoplay=1", "player", "640", "480", "9.0.0","expressInstall.swf", flashvars, params, attributes, function() {
+                            $('#player').css('z-index', 200);
+                            $('#player').css('position', 'absolute');
+                            $('#player').css('top', height/2 - 240);
+                            $('#player').css('left', width/2 - 320);
+                        });
+                    });
                 } else {
                     thumb_clicked = null;
                 }
