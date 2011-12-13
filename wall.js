@@ -10,7 +10,7 @@ function init() {
 
     var paper = Raphael(0, 0, width, height);
 
-    DM.api('/videos', {limit: 100, fields: 'thumbnail_medium_url,title', filters: 'official', channel: 'music', sort: 'visited-week'}, function(response) {
+    DM.api('/videos', {limit: 100, fields: 'thumbnail_medium_url,title', filters: 'official', channel: 'sexy', sort: 'visited-week'}, function(response) {
         var list = response.list;
         var iter = 0;
 
@@ -26,16 +26,26 @@ function init() {
             }
         }
 
+        var thumb_clicked = null;
+
         function draw_elt() {
             rand_pos = Math.floor(Math.random() * position.length);
             pos = position[rand_pos];
-            console.log(position.length);
             position.splice(rand_pos, 1);
             var thumb = paper.image(list[iter].thumbnail_medium_url, pos.x, pos.y, 160, 120);
+            thumb.pos = pos;
+
             thumb.toBack();
+
             thumb.click(function() {
-                console.log(this.src);
-                this.toFront().animate({x: width/2 - 320, y: height/2 - 240, width: 640, height: 480}, 500);
+                if (thumb_clicked != null) {
+                    thumb_clicked.toBack().animate({x: thumb_clicked.pos.x, y: thumb_clicked.pos.y, width: 160, height: 120}, 300, 'bounce');
+                }
+                if (this != thumb_clicked) {
+                    this.toFront().animate({x: width/2 - 320, y: height/2 - 240, width: 640, height: 480}, 300, 'bounce', function() {thumb_clicked = this;});
+                } else {
+                    thumb_clicked = null;
+                }
             });
 
             thumb.hover(
