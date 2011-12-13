@@ -10,7 +10,7 @@ function init() {
 
     var paper = Raphael(0, 0, width, height);
 
-    DM.api('/videos', {limit: 100, fields: 'thumbnail_medium_url,title', filters: 'official', channel: 'music', sort: 'visited-week'}, function(response) {
+    DM.api('/videos', {limit: 100, fields: 'id,thumbnail_medium_url,title', filters: 'official', channel: 'music', sort: 'visited-week'}, function(response) {
         var list = response.list;
         var iter = 0;
 
@@ -32,10 +32,20 @@ function init() {
             console.log(position.length);
             position.splice(rand_pos, 1);
             var thumb = paper.image(list[iter].thumbnail_medium_url, pos.x, pos.y, 160, 120);
+            thumb.dm = list[iter];
             thumb.toBack();
             thumb.click(function() {
-                console.log(this.src);
-                this.toFront().animate({x: width/2 - 320, y: height/2 - 240, width: 640, height: 480}, 500);
+                this.toFront().animate({x: width/2 - 320, y: height/2 - 240, width: 640, height: 480}, 500, function() {
+                    flashvars = {};
+                    params = {};
+                    attributes = {};
+                    swfobject.embedSWF("http://dailymotion.com/swf/" + thumb.dm.id + "?enableApi=1&autoplay=1", "player", "640", "480", "9.0.0","expressInstall.swf", flashvars, params, attributes, function() {
+                        $('#player').css('z-index', 200);
+                        $('#player').css('position', 'absolute');
+                        $('#player').css('top', height/2 - 240);
+                        $('#player').css('left', width/2 - 320);
+                    });
+                });
             });
 
             thumb.hover(
