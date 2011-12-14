@@ -63,11 +63,10 @@ function init() {
 
             thumb.hover(
                 function(){
-                    this.animate({opacity: 1, width: this.attrs.width+5, height: this.attrs.height+5}, 300);
-
+                    this.animate({opacity: 1, transform: 's1.15'}, 300, 'backOut');
                 },
                 function(){
-                    this.animate({opacity: 0.4, width: this.attrs.width-5, height: this.attrs.height-5}, 300);
+                    this.animate({opacity: 0.4, transform: 's0.95'}, 300, 'linear');
                 });
 
             iter += 1;
