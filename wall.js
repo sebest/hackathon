@@ -102,10 +102,10 @@ function init() {
 
             thumb.hover(
                 function(){
-                    this.animate({opacity: 1, transform: 's1.15'}, 300, 'backOut');
+                    this.animate({opacity: 1, transform: 's1.2'}, 300, 'backOut');
                 },
                 function(){
-                    this.animate({opacity: 0.4, transform: 's0.95'}, 300, 'linear');
+                    this.animate({opacity: 0.4, transform: 's1'}, 300, 'linear');
                 });
 
             iter += 1;
