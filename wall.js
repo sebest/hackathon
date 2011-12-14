@@ -4,11 +4,7 @@ DM.init({
     cookie: true
 });
 
-function init() {
-    var width = $(window).width();
-    var height = $(window).height();
-    var paper = Raphael(0, 0, width, height);
-
+$(document).ready(function() {
     $('#submit-button').click(function(e) {
         DM.api('/videos', {limit: 100, search:$('#search-input').val(), fields: 'thumbnail_medium_url,title,id', sort: 'relevance'}, function(response) {
             console.log(response);
@@ -18,15 +14,29 @@ function init() {
         e.preventDefault();
     });
 
+    $('#bar a').click(function(e) {
+        DM.api('/videos', {limit: 100, fields: 'thumbnail_medium_url,title,id', sort: 'visited-month', channel: $(e.target).attr('data-channel')}, function(response) {
+            handleResponse(response);
+        });
+
+        e.preventDefault();
+    });
+});
+
+function init() {
+    var width = $(window).width();
+    var height = $(window).height();
+    var paper = Raphael(0, 0, width, height);
 
     function handleResponse(response) {
-    paper.clear();
+        paper.clear();
         var list = response.list;
         var iter = 0;
 
         var pos_x = 0;
         var pos_y = 0;
         var position = [];
+        var thumb_clicked = null;
         for (var i = 0; i < response.list.length; i++) {
             position.push({x: pos_x, y: pos_y});
             pos_x += 160;
@@ -34,6 +44,12 @@ function init() {
                 pos_y += 120;
                 pos_x = 0;
             }
+        }
+
+        function zoomVideo() {
+        }
+
+        function unzoomVideo() {
         }
 
         function draw_elt() {
@@ -48,11 +64,13 @@ function init() {
             thumb.click(function() {
                 if (thumb_clicked != null) {
                     // there is already a player displayed
-                    thumb_clicked.toBack().animate({x: thumb_clicked.pos.x, y: thumb_clicked.pos.y, width: 160, height: 120}, 300, 'bounce', function() {$('#player').empty();});
+                    thumb_clicked.toBack().animate({x: thumb_clicked.pos.x, y: thumb_clicked.pos.y, width: 160, height: 120}, 300, 'bounce', function() {
+                        $('#player').empty();
+                    });
                 }
                 if (this != thumb_clicked) {
                     // this is a different player
-                    this.toFront().animate({x: width/2 - 320, y: height/2 - 240, width: 640, height: 480}, 300, 'bounce', function() {
+                    this.toFront().animate({x: width/2 - 320, y: height/2 - 240, width: 640, height: 480}, 800, 'bounce', function() {
                         thumb_clicked = this;
                         flashvars = {};
                         params = {};
@@ -69,14 +87,11 @@ function init() {
                 }
             });
 
-            thumb.hover(
-                function(){
-                    this.animate({opacity: 1, width: this.attrs.width+5, height: this.attrs.height+5}, 300);
-
-                },
-                function(){
-                    this.animate({opacity: 0.4, width: this.attrs.width-5, height: this.attrs.height-5}, 300);
-                });
+            thumb.hover(function() {
+                this.animate({opacity: 1, transform: 's1.15'}, 300, 'backOut');
+            }, function() {
+                this.animate({opacity: 0.4, transform: 's0.95'}, 300, 'linear');
+            });
 
             iter += 1;
             if (iter  == response.list.length) {
