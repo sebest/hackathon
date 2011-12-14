@@ -7,10 +7,20 @@ DM.init({
 function init() {
     var width = $(window).width();
     var height = $(window).height();
-
     var paper = Raphael(0, 0, width, height);
 
-    DM.api('/videos', {limit: 100, fields: 'thumbnail_medium_url,title,id', filters: 'official', channel: 'sport', sort: 'visited-week'}, function(response) {
+    $('#submit-button').click(function(e) {
+        DM.api('/videos', {limit: 100, search:$('#search-input').value, fields: 'thumbnail_medium_url,title,id'}, function(response) {
+            console.log(response);
+            handleResponse(response);
+        });
+
+        e.preventDefault();
+    });
+
+
+    function handleResponse(response) {
+    paper.clear();
         var list = response.list;
         var iter = 0;
 
@@ -80,6 +90,11 @@ function init() {
         for (var i = 0; i < response.list.length; i++) {
             setTimeout(draw_elt, i * 20)
         }
+    }
+
+
+    DM.api('/videos', {limit: 100, fields: 'thumbnail_medium_url,title,id', filters: 'official', channel: 'sport', sort: 'visited-week'}, function(response) {
+        handleResponse(response);
     });
 }
 
