@@ -4,6 +4,11 @@ DM.init({
     cookie: true
 });
 
+function onDailymotionPlayerReady(playerId)
+{
+    dmplayer = document.getElementById("player");
+}
+
 function init() {
     var width = $(window).width();
     var height = $(window).height();
@@ -18,23 +23,42 @@ function init() {
         e.preventDefault();
     });
 
+    function show_player(x, y, dm_id) {
+        flashvars = {};
+        params = {allowScriptAccess: "always"};
+        attributes = {};
+        swfobject.embedSWF("http://dailymotion.com/swf/" + dm_id + "?enableApi=1&autoplay=0&auditude=0&chromeless=1&playerapiid=dmplayer&expandVideo=1", "player", "640", "480", "9.0.0","expressInstall.swf", flashvars, params, attributes, function() {
+            $('#player').css('z-index', 200);
+            $('#player').css('position', 'absolute');
+            $('#player').css('top', y);
+            $('#player').css('left', x);
+        });
+    }
 
     function handleResponse(response) {
-    paper.clear();
+        paper.clear();
         var list = response.list;
         var iter = 0;
+
+        var player_x = Math.round(((width / 2) - 320) / 160) * 160;
+        var player_y = Math.round(((height / 2) - 240) / 120) * 120;
 
         var pos_x = 0;
         var pos_y = 0;
         var position = [];
-        for (var i = 0; i < response.list.length; i++) {
-            position.push({x: pos_x, y: pos_y});
+        for (var i = 0; i < response.list.length;) {
+            if (!(pos_x >= player_x && pos_y >= player_y && pos_x < player_x + 4 * 160 && pos_y < player_y + 4 * 120)) {
+                position.push({x: pos_x, y: pos_y});
+                i++;
+            }
             pos_x += 160;
             if (pos_x > width) {
                 pos_y += 120;
                 pos_x = 0;
             }
         }
+
+        show_player(player_x, player_y, list[0].id);
 
         function draw_elt() {
             rand_pos = Math.floor(Math.random() * position.length);
@@ -46,27 +70,7 @@ function init() {
             thumb.toBack();
 
             thumb.click(function() {
-                if (thumb_clicked != null) {
-                    // there is already a player displayed
-                    thumb_clicked.toBack().animate({x: thumb_clicked.pos.x, y: thumb_clicked.pos.y, width: 160, height: 120}, 300, 'bounce', function() {$('#player').empty();});
-                }
-                if (this != thumb_clicked) {
-                    // this is a different player
-                    this.toFront().animate({x: width/2 - 320, y: height/2 - 240, width: 640, height: 480}, 300, 'bounce', function() {
-                        thumb_clicked = this;
-                        flashvars = {};
-                        params = {};
-                        attributes = {};
-                        swfobject.embedSWF("http://dailymotion.com/swf/" + thumb.dm.id + "?enableApi=1&autoplay=1&auditude=0", "player", "640", "480", "9.0.0","expressInstall.swf", flashvars, params, attributes, function() {
-                            $('#player').css('z-index', 200);
-                            $('#player').css('position', 'absolute');
-                            $('#player').css('top', height/2 - 240);
-                            $('#player').css('left', width/2 - 320);
-                        });
-                    });
-                } else {
-                    thumb_clicked = null;
-                }
+                dmplayer.loadVideoById(thumb.dm.id)
             });
 
             thumb.hover(
@@ -78,13 +82,13 @@ function init() {
                 });
 
             iter += 1;
-            if (iter  == response.list.length) {
+            if (iter  == list.length) {
                 return;
             }
             thumb.animate({opacity: 0.3}, 500, '>');
         }
 
-        for (var i = 0; i < response.list.length; i++) {
+        for (var i = 0; i < list.length; i++) {
             setTimeout(draw_elt, i * 20)
         }
     }
