@@ -10,7 +10,7 @@ function init() {
     var paper = Raphael(0, 0, width, height);
 
     $('#submit-button').click(function(e) {
-        DM.api('/videos', {limit: 100, search:$('#search-input').value, fields: 'thumbnail_medium_url,title,id'}, function(response) {
+        DM.api('/videos', {limit: 100, search:$('#search-input').val(), fields: 'thumbnail_medium_url,title,id', sort: 'relevance'}, function(response) {
             console.log(response);
             handleResponse(response);
         });
@@ -36,8 +36,6 @@ function init() {
             }
         }
 
-        var thumb_clicked = null;
-
         function draw_elt() {
             rand_pos = Math.floor(Math.random() * position.length);
             pos = position[rand_pos];
@@ -59,7 +57,7 @@ function init() {
                         flashvars = {};
                         params = {};
                         attributes = {};
-                        swfobject.embedSWF("http://dailymotion.com/swf/" + thumb.dm.id + "?enableApi=1&autoplay=1", "player", "640", "480", "9.0.0","expressInstall.swf", flashvars, params, attributes, function() {
+                        swfobject.embedSWF("http://dailymotion.com/swf/" + thumb.dm.id + "?enableApi=1&autoplay=1&auditude=0", "player", "640", "480", "9.0.0","expressInstall.swf", flashvars, params, attributes, function() {
                             $('#player').css('z-index', 200);
                             $('#player').css('position', 'absolute');
                             $('#player').css('top', height/2 - 240);
