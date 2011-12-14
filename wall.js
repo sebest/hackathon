@@ -7,41 +7,54 @@ DM.init({
 function onDailymotionPlayerReady(playerId)
 {
     dmplayer = document.getElementById("player");
-    dmplayer.addEventListener("onVideoProgress", "onVideoProgress");
-    dmplayer.addEventListener("onVideoMetadata", "onVideoMetadata");
 }
 
-function onVideoProgress(e) {
-    console.log(e.mediaProgress);
-    console.log(e.mediaTime);
-}
+function initChannel() {
+    $('#bar a').each(function() {
+        $(this).removeClass('active');
+    });
 
-function onVideoMetadata(e) {
-    console.log(e.videoDuration);
+    return false;
 }
 
 function init() {
     var width = $(window).width();
     var height = $(window).height();
-    var paper = Raphael(0, 0, width, height);
+    var paper = Raphael(0, 70, width, height);
 
-    $('#submit-button').click(function(e) {
+    $('#search-button').click(function(e) {
+        $('#bar a').each(function() {
+            $(this).removeClass('active');
+        });
+
         DM.api('/videos', {limit: 100, search:$('#search-input').val(), fields: 'thumbnail_medium_url,title,id', sort: 'relevance'}, function(response) {
-            console.log(response);
             handleResponse(response);
         });
 
         e.preventDefault();
     });
 
+    $('#bar a').click(function(e) {
+        $('#bar a').each(function() {
+            $(this).removeClass('active');
+        });
+
+        $(this).addClass('active');
+
+        $('#search-input').val('');
+        DM.api('/videos', {limit: 100, fields: 'thumbnail_medium_url,title,id', sort: 'visited-month', channel: $(e.target).attr('data-channel')}, function(response) {
+            handleResponse(response);
+        });
+    });
+
     function show_player(x, y, dm_id) {
         flashvars = {};
         params = {allowScriptAccess: "always"};
         attributes = {};
-        swfobject.embedSWF("http://dailymotion.com/swf/" + dm_id + "?enableApi=1&autoplay=0&auditude=0&chromeless=1&playerapiid=dmplayer&expandVideo=1", "player", "640", "480", "9.0.0","expressInstall.swf", flashvars, params, attributes, function() {
+        swfobject.embedSWF("http://dailymotion.com/swf/" + dm_id + "?enableApi=1&autoplay=1&&auditude=0&playerapiid=dmplayer&expandVideo=1&hideControls=1", "player", "640", "480", "9.0.0","expressInstall.swf", flashvars, params, attributes, function() {
             $('#player').css('z-index', 200);
             $('#player').css('position', 'absolute');
-            $('#player').css('top', y);
+            $('#player').css('top', y + 70);
             $('#player').css('left', x);
         });
     }
@@ -57,6 +70,7 @@ function init() {
         var pos_x = 0;
         var pos_y = 0;
         var position = [];
+        var thumb_clicked = null;
         for (var i = 0; i < response.list.length;) {
             if (!(pos_x >= player_x && pos_y >= player_y && pos_x < player_x + 4 * 160 && pos_y < player_y + 4 * 120)) {
                 position.push({x: pos_x, y: pos_y});
@@ -81,7 +95,31 @@ function init() {
             thumb.toBack();
 
             thumb.click(function() {
-                dmplayer.loadVideoById(thumb.dm.id)
+                dmplayer.loadVideoById(thumb.dm.id);
+
+                //if (thumb_clicked != null) {
+                    // there is already a player displayed
+                    //thumb_clicked.toBack().animate({x: thumb_clicked.pos.x, y: thumb_clicked.pos.y, width: 160, height: 120}, 300, 'bounce', function() {
+                        //$('#player').empty();
+                    //});
+                //}
+                //if (this != thumb_clicked) {
+                    // this is a different player
+                    //this.toFront().animate({x: width/2 - 320, y: height/2 - 240, width: 640, height: 480}, 800, 'bounce', function() {
+                        //thumb_clicked = this;
+                        //flashvars = {};
+                        //params = {};
+                        //attributes = {};
+                        //swfobject.embedSWF("http://dailymotion.com/swf/" + thumb.dm.id + "?enableApi=1&autoplay=1&auditude=0", "player", "640", "480", "9.0.0","expressInstall.swf", flashvars, params, attributes, function() {
+                            //$('#player').css('z-index', 200);
+                            //$('#player').css('position', 'absolute');
+                            //$('#player').css('top', height/2 - 240);
+                            //$('#player').css('left', width/2 - 320);
+                        //});
+                    //});
+                //} else {
+                    //thumb_clicked = null;
+                //}
             });
 
             thumb.hover(
@@ -105,7 +143,7 @@ function init() {
     }
 
 
-    DM.api('/videos', {limit: 100, fields: 'thumbnail_medium_url,title,id', filters: 'official', channel: 'sport', sort: 'visited-week'}, function(response) {
+    DM.api('/videos', {limit: 100, fields: 'thumbnail_medium_url,title,id', filters: 'official', channel: 'music', sort: 'visited-month'}, function(response) {
         handleResponse(response);
     });
 }

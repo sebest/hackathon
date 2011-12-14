@@ -9,12 +9,23 @@
   </head>
   <body>
     <div id="bar">
-        <form action="" method="post">
-            <input type="text" id="search-input" name="search-input" value="" placeholder="Search"/>
-            <input type="submit" id="submit-button" name="submit-button" value="OK"/>
-            <a href="javascript:dmplayer.playVideo()">Play</a>
-            <a href="javascript:dmplayer.pauseVideo()">Pause</a>
-        </form>
+        <div id="logo">
+            <img src="img/logo.png"/>
+        </div>
+        <div id="search">
+            <form action="" method="post" onsubmit="return initChannel();">
+                <input type="text" id="search-input" name="search-input" value="" placeholder="Search"/>
+                <input type="image" src="img/search.png" id="search-button" name="search-button" value="OK"/>
+            </form>
+        </div>
+        <div id="channels">
+            <a href="#" data-channel="music">Music</a>
+            <a href="#" data-channel="sport">Sport</a>
+            <a href="#" data-channel="shortfilms">Cinema</a>
+            <a href="#" data-channel="news">News</a>
+            <a href="#" data-channel="videogames">Video Games</a>
+            <a href="#" data-channel="sexy">Sexy</a>
+        </div>
     </div>
     <div id="player"></div>
   </body>
