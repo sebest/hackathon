@@ -7,6 +7,17 @@ DM.init({
 function onDailymotionPlayerReady(playerId)
 {
     dmplayer = document.getElementById("player");
+    dmplayer.addEventListener("onVideoProgress", "onVideoProgress");
+    dmplayer.addEventListener("onVideoMetadata", "onVideoMetadata");
+}
+
+function onVideoProgress(e) {
+    console.log(e.mediaProgress);
+    console.log(e.mediaTime);
+}
+
+function onVideoMetadata(e) {
+    console.log(e.videoDuration);
 }
 
 function init() {
