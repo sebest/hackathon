@@ -24,6 +24,7 @@ function init() {
     var width = $(window).width();
     var height = $(window).height();
     var paper = Raphael(0, 0, width, height);
+    var thumbs = [];
 
     $('#submit-button').click(function(e) {
         DM.api('/videos', {limit: 100, search:$('#search-input').val(), fields: 'thumbnail_medium_url,title,id', sort: 'relevance'}, function(response) {
@@ -38,7 +39,7 @@ function init() {
         flashvars = {};
         params = {allowScriptAccess: "always"};
         attributes = {};
-        swfobject.embedSWF("http://dailymotion.com/swf/" + dm_id + "?enableApi=1&autoplay=0&auditude=0&chromeless=1&playerapiid=dmplayer&expandVideo=1", "player", "640", "480", "9.0.0","expressInstall.swf", flashvars, params, attributes, function() {
+        swfobject.embedSWF("http://dailymotion.com/swf/" + dm_id + "?enableApi=1&autoplay=0&auditude=0&chromeless=1&playerapiid=dmplayer&expandVideo=1&forcedQuality=hq", "player", "640", "480", "9.0.0","expressInstall.swf", flashvars, params, attributes, function() {
             $('#player').css('z-index', 200);
             $('#player').css('position', 'absolute');
             $('#player').css('top', y);
@@ -76,6 +77,7 @@ function init() {
             pos = position[rand_pos];
             position.splice(rand_pos, 1);
             var thumb = paper.image(list[iter].thumbnail_medium_url, pos.x, pos.y, 160, 120);
+            thumbs.push(thumb);
             thumb.pos = pos;
             thumb.dm = list[iter];
             thumb.toBack();
@@ -102,10 +104,20 @@ function init() {
         for (var i = 0; i < list.length; i++) {
             setTimeout(draw_elt, i * 20)
         }
+
+        function christmasTree() {
+            pos = Math.floor(Math.random() * thumbs.length);
+            var thumb = thumbs[pos];
+            if (thumb){
+                thumb.animate({opacity: 1}, 300, '>', function() {thumb.animate({opacity: 0.4}, 300, 'linear')});
+            }
+            setTimeout(christmasTree, Math.random() * 2000);
+        }
+        christmasTree();
     }
 
 
-    DM.api('/videos', {limit: 100, fields: 'thumbnail_medium_url,title,id', filters: 'official', channel: 'sport', sort: 'visited-week'}, function(response) {
+    DM.api('/videos', {limit: 100, fields: 'thumbnail_medium_url,title,id', filters: 'official', channel: 'music', sort: 'visited-week'}, function(response) {
         handleResponse(response);
     });
 }
