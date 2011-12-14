@@ -52,7 +52,7 @@ function init() {
         flashvars = {};
         params = {allowScriptAccess: "always"};
         attributes = {};
-        swfobject.embedSWF("http://dailymotion.com/swf/" + dm_id + "?enableApi=1&autoplay=1&auditude=0&playerapiid=dmplayer", "player", "640", "480", "9.0.0","expressInstall.swf", flashvars, params, attributes, function() {
+        swfobject.embedSWF("http://dailymotion.com/swf/" + dm_id + "?enableApi=1&autoplay=1&chromeless=1&auditude=0&playerapiid=dmplayer", "player", "640", "480", "9.0.0","expressInstall.swf", flashvars, params, attributes, function() {
             $('#player').css('z-index', 200);
             $('#player').css('position', 'absolute');
             $('#player').css('top', y + 70);
