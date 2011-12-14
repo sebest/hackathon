@@ -21,6 +21,7 @@ function init() {
     var width = $(window).width();
     var height = $(window).height();
     var paper = Raphael(0, 70, width, height);
+    var thumbs = [];
 
     $('#search-button').click(function(e) {
         $('#bar a').each(function() {
@@ -51,7 +52,7 @@ function init() {
         flashvars = {};
         params = {allowScriptAccess: "always"};
         attributes = {};
-        swfobject.embedSWF("http://dailymotion.com/swf/" + dm_id + "?enableApi=1&autoplay=1&&auditude=0&playerapiid=dmplayer&expandVideo=1&hideControls=1", "player", "640", "480", "9.0.0","expressInstall.swf", flashvars, params, attributes, function() {
+        swfobject.embedSWF("http://dailymotion.com/swf/" + dm_id + "?enableApi=1&autoplay=1&auditude=0&playerapiid=dmplayer", "player", "640", "480", "9.0.0","expressInstall.swf", flashvars, params, attributes, function() {
             $('#player').css('z-index', 200);
             $('#player').css('position', 'absolute');
             $('#player').css('top', y + 70);
@@ -90,36 +91,13 @@ function init() {
             pos = position[rand_pos];
             position.splice(rand_pos, 1);
             var thumb = paper.image(list[iter].thumbnail_medium_url, pos.x, pos.y, 160, 120);
+            thumbs.push(thumb);
             thumb.pos = pos;
             thumb.dm = list[iter];
             thumb.toBack();
 
             thumb.click(function() {
                 dmplayer.loadVideoById(thumb.dm.id);
-
-                //if (thumb_clicked != null) {
-                    // there is already a player displayed
-                    //thumb_clicked.toBack().animate({x: thumb_clicked.pos.x, y: thumb_clicked.pos.y, width: 160, height: 120}, 300, 'bounce', function() {
-                        //$('#player').empty();
-                    //});
-                //}
-                //if (this != thumb_clicked) {
-                    // this is a different player
-                    //this.toFront().animate({x: width/2 - 320, y: height/2 - 240, width: 640, height: 480}, 800, 'bounce', function() {
-                        //thumb_clicked = this;
-                        //flashvars = {};
-                        //params = {};
-                        //attributes = {};
-                        //swfobject.embedSWF("http://dailymotion.com/swf/" + thumb.dm.id + "?enableApi=1&autoplay=1&auditude=0", "player", "640", "480", "9.0.0","expressInstall.swf", flashvars, params, attributes, function() {
-                            //$('#player').css('z-index', 200);
-                            //$('#player').css('position', 'absolute');
-                            //$('#player').css('top', height/2 - 240);
-                            //$('#player').css('left', width/2 - 320);
-                        //});
-                    //});
-                //} else {
-                    //thumb_clicked = null;
-                //}
             });
 
             thumb.hover(
@@ -140,6 +118,16 @@ function init() {
         for (var i = 0; i < list.length; i++) {
             setTimeout(draw_elt, i * 20)
         }
+
+        function christmasTree() {
+            pos = Math.floor(Math.random() * thumbs.length);
+            var thumb = thumbs[pos];
+            if (thumb){
+                thumb.animate({opacity: 1}, 300, '>', function() {thumb.animate({opacity: 0.4}, 300, 'linear')});
+            }
+            setTimeout(christmasTree, Math.random() * 2000);
+        }
+        christmasTree();
     }
 
 
