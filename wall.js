@@ -5,8 +5,8 @@ DM.init({
 });
 
 function init() {
-    var width = $('body').width();
-    var height = $('body').height();
+    var width = $(window).width();
+    var height = $(window).height();
 
     var paper = Raphael(0, 0, width, height);
 
